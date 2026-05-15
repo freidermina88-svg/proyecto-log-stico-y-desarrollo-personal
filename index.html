@@ -32,6 +32,10 @@ html,body{
   overflow:hidden;
 }
 
+@media(max-width:768px){
+  html,body{overflow:auto;}
+}
+
 /* ── SCANLINE OVERLAY ── */
 body::before{
   content:'';
@@ -50,6 +54,135 @@ body::after{
 
 /* ── LAYOUT ── */
 .app{display:flex;height:100vh;}
+
+/* ══════════════════════════════════════
+   RESPONSIVE — MOBILE BOTTOM NAV
+══════════════════════════════════════ */
+
+/* Hamburger button — hidden on desktop */
+.mob-menu-btn{display:none;}
+
+/* Bottom nav bar — hidden on desktop */
+.bottom-nav{display:none;}
+
+@media(max-width:768px){
+
+  /* Full app scrolls vertically */
+  .app{
+    flex-direction:column;
+    height:auto;
+    min-height:100vh;
+    padding-bottom:70px; /* space for bottom nav */
+  }
+
+  /* Sidebar hidden on mobile */
+  aside.sidebar{display:none;}
+
+  /* Main fills width */
+  main{width:100%;overflow:visible;}
+
+  /* Topbar compact */
+  header.topbar{
+    height:auto;
+    padding:12px 16px;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+
+  .top-title{font-size:18px;letter-spacing:2px;}
+  .top-sub{font-size:11px;}
+
+  .top-actions .btn:not(.btn-primary){display:none;}
+  .btn-primary{padding:8px 14px;font-size:13px;}
+
+  /* Body stacks vertically */
+  .body{
+    flex-direction:column;
+    overflow:visible;
+  }
+
+  /* Chat section full width */
+  .chat-section{
+    padding:14px;
+    min-height:calc(100vh - 140px);
+  }
+
+  .section-title{font-size:22px;letter-spacing:2px;}
+  .section-sub{font-size:12px;margin-bottom:12px;}
+
+  /* Chat area scrolls inside */
+  .chat-area{
+    max-height:55vh;
+    overflow-y:auto;
+  }
+
+  /* Bubbles narrower */
+  .bubble{max-width:100%;font-size:14px;padding:12px 14px;}
+  .avatar{width:34px;height:34px;min-width:34px;font-size:13px;}
+
+  /* Input row */
+  .chat-input{padding:12px 14px;font-size:14px;}
+  .send-btn{padding:0 18px;font-size:16px;}
+
+  /* Right panel becomes horizontal scroll strip */
+  .right-panel{
+    width:100%;min-width:unset;
+    border-left:none;
+    border-top:1px solid var(--border);
+    flex-direction:row;
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    overflow-y:hidden;
+    gap:12px;
+    padding:16px 14px;
+    scroll-snap-type:x mandatory;
+  }
+
+  .right-panel::-webkit-scrollbar{height:3px;}
+  .right-panel .panel-title{display:none;}
+
+  .verse-card,.card{
+    min-width:240px;
+    scroll-snap-align:start;
+    flex-shrink:0;
+  }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav{
+    display:flex;
+    position:fixed;
+    bottom:0;left:0;right:0;
+    height:64px;
+    background:var(--surface);
+    border-top:1px solid var(--border);
+    z-index:500;
+    justify-content:space-around;
+    align-items:center;
+    padding:0 4px;
+  }
+
+  .bnav-btn{
+    flex:1;
+    background:transparent;
+    border:none;
+    color:var(--dim);
+    font-family:'Rajdhani',sans-serif;
+    font-size:11px;font-weight:600;
+    letter-spacing:.5px;
+    cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+    padding:8px 4px;
+    transition:color .2s;
+  }
+
+  .bnav-btn .icon{font-size:20px;line-height:1;}
+
+  .bnav-btn:hover,.bnav-btn.active{color:var(--gold);}
+  .bnav-btn.active .icon{
+    filter:drop-shadow(0 0 6px rgba(201,168,76,.6));
+    transform:scale(1.1);
+  }
+}
 
 /* ── SIDEBAR ── */
 aside.sidebar{
@@ -476,6 +609,12 @@ header.topbar{
   0%,100%{text-shadow:0 0 30px rgba(201,168,76,.3);}
   50%{text-shadow:0 0 60px rgba(201,168,76,.7),0 0 100px rgba(201,168,76,.3);}
 }
+
+/* Modal full-screen on mobile */
+@media(max-width:768px){
+  .modal{width:96%;max-height:88vh;padding:22px 16px;}
+  .modal-title{font-size:20px;}
+}
 </style>
 </head>
 <body>
@@ -702,6 +841,25 @@ header.topbar{
 
 </div><!-- /app -->
 
+<!-- ── BOTTOM NAV (mobile only) ── -->
+<nav class="bottom-nav">
+  <button class="bnav-btn active" onclick="setSection('chat');setActiveNav(this)">
+    <span class="icon">🧠</span>Chat
+  </button>
+  <button class="bnav-btn" onclick="openModal('modalOpp');setActiveNav(this)">
+    <span class="icon">📈</span>Oportunidades
+  </button>
+  <button class="bnav-btn" onclick="openModal('modalColombia');setActiveNav(this)">
+    <span class="icon">🇨🇴</span>Colombia
+  </button>
+  <button class="bnav-btn" onclick="openModal('modalSocial');setActiveNav(this)">
+    <span class="icon">❤️</span>Social
+  </button>
+  <button class="bnav-btn" onclick="openModal('modalAudit');setActiveNav(this)">
+    <span class="icon">⚡</span>Auditoría
+  </button>
+</nav>
+
 <script>
 // ══════════════════════════════════════
 //  CONFIGURACIÓN — REEMPLAZA AQUÍ
@@ -897,6 +1055,11 @@ function toggleJarvis(){
 }
 
 function setSection(s){ /* placeholder para navegación futura */ }
+
+function setActiveNav(el){
+  document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));
+  if(el) el.classList.add('active');
+}
 
 // ══════════════════════════════════════
 //  INIT
